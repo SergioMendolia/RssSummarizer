@@ -53,7 +53,7 @@ export class ArticleCache {
       .query(
         `SELECT id, feed_name, title, link, pub_date, summary, status, error_message
          FROM articles
-         WHERE feed_name = ? AND status = 'done'
+         WHERE feed_name = ? AND status IN ('done', 'error')
          ORDER BY pub_date DESC
          LIMIT ?`
       )
@@ -64,7 +64,7 @@ export class ArticleCache {
       link: string;
       pub_date: string;
       summary: string | null;
-      status: "done";
+      status: "done" | "error";
       error_message: string | null;
     }>;
 

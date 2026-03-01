@@ -23,15 +23,20 @@ export function generateFeed(
   });
 
   for (const article of articles) {
-    const content = article.summary
-      ? `<p>${escapeHtml(article.summary)}</p>\n<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`
-      : `<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
+    let content: string;
+    if (article.status === "error") {
+      content = `<p><em>Summary unavailable.</em></p>\n<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
+    } else if (article.summary) {
+      content = `<p>${escapeHtml(article.summary)}</p>\n<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
+    } else {
+      content = `<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
+    }
 
     feed.addItem({
       title: article.title,
       id: article.id,
       link: article.link,
-      description: article.summary || "",
+      description: article.status === "error" ? "Summary unavailable." : (article.summary || ""),
       content,
       date: new Date(article.pubDate),
     });
