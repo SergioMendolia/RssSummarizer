@@ -26,7 +26,7 @@ process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
 
 console.log(`RSS Summarizer running on http://${config.server.host}:${config.server.port}`);
-console.log(`Feeds: ${config.feeds.map((f) => `/feed/${f.name}`).join(", ")}`);
+console.log(`Feeds: ${config.feeds.map((f) => `/feed/${f.name}`).join(", ")}, /feed/all`);
 
 export default {
   port: config.server.port,

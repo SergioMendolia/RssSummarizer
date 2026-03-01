@@ -45,6 +45,44 @@ export function generateFeed(
   return feed.rss2();
 }
 
+export function generateAggregatedFeed(
+  articles: CachedArticle[],
+  baseUrl: string
+): string {
+  const feedUrl = `${baseUrl}/feed/all`;
+
+  const feed = new Feed({
+    title: "All Feeds (Summarized)",
+    description: "AI-summarized aggregation of all feeds",
+    id: feedUrl,
+    link: feedUrl,
+    feedLinks: { rss: feedUrl },
+    copyright: "",
+  });
+
+  for (const article of articles) {
+    let content: string;
+    if (article.status === "error") {
+      content = `<p><em>Summary unavailable.</em></p>\n<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
+    } else if (article.summary) {
+      content = `<p>${escapeHtml(article.summary)}</p>\n<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
+    } else {
+      content = `<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
+    }
+
+    feed.addItem({
+      title: article.title,
+      id: article.id,
+      link: article.link,
+      description: article.status === "error" ? "Summary unavailable." : (article.summary || ""),
+      content,
+      date: new Date(article.pubDate),
+    });
+  }
+
+  return feed.rss2();
+}
+
 function escapeHtml(text: string): string {
   return text
     .replace(/&/g, "&amp;")

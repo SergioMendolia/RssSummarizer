@@ -118,6 +118,38 @@ export class ArticleCache {
     return result.changes;
   }
 
+  getAllArticles(limit: number): CachedArticle[] {
+    const rows = this.db
+      .query(
+        `SELECT id, feed_name, title, link, pub_date, summary, status, error_message
+         FROM articles
+         WHERE status IN ('done', 'error')
+         ORDER BY pub_date DESC
+         LIMIT ?`
+      )
+      .all(limit) as Array<{
+      id: string;
+      feed_name: string;
+      title: string;
+      link: string;
+      pub_date: string;
+      summary: string | null;
+      status: "done" | "error";
+      error_message: string | null;
+    }>;
+
+    return rows.map((r) => ({
+      id: r.id,
+      feedName: r.feed_name,
+      title: r.title,
+      link: r.link,
+      pubDate: r.pub_date,
+      summary: r.summary,
+      status: r.status,
+      errorMessage: r.error_message,
+    }));
+  }
+
   getFeedStats(): Array<{ feedName: string; total: number; done: number; errors: number }> {
     const rows = this.db
       .query(
