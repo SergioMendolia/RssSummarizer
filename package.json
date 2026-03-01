@@ -1,0 +1,27 @@
+{
+  "name": "rss-summarizer",
+  "version": "0.1.0",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun --watch run src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/js-yaml": "^4.0.9"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "feed": "^5.2.0",
+    "hono": "^4.12.3",
+    "js-yaml": "^4.1.1",
+    "linkedom": "^0.18.12",
+    "ollama": "^0.5.14",
+    "rss-parser": "^3.13.0"
+  }
+}

@@ -1,0 +1,23 @@
+server:
+  port: 3000
+  host: "0.0.0.0"
+
+llm:
+  host: "http://localhost:11434"  # Ollama server URL
+  model: "gemma3:12b"
+  maxTokens: 500
+
+cache:
+  dbPath: "./data/cache.sqlite"
+  articleTtlDays: 30
+
+feeds:
+  - name: "hacker-news"            # URL slug → /feed/hacker-news
+    url: "https://hnrss.org/frontpage"
+    refreshMinutes: 15
+    maxItems: 20
+
+  - name: "lobsters"
+    url: "https://lobste.rs/rss"
+    refreshMinutes: 30
+    maxItems: 25
