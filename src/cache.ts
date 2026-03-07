@@ -9,6 +9,7 @@ export interface CachedArticle {
   link: string;
   pubDate: string;
   summary: string | null;
+  imageUrl: string | null;
   status: "pending" | "done" | "error";
   errorMessage: string | null;
 }
@@ -41,6 +42,12 @@ export class ArticleCache {
       CREATE INDEX IF NOT EXISTS idx_articles_status ON articles(status);
       CREATE INDEX IF NOT EXISTS idx_articles_created ON articles(created_at);
     `);
+
+    // Migrate: add image_url column if missing
+    const columns = this.db.query("PRAGMA table_info(articles)").all() as Array<{ name: string }>;
+    if (!columns.some((c) => c.name === "image_url")) {
+      this.db.exec("ALTER TABLE articles ADD COLUMN image_url TEXT");
+    }
   }
 
   hasArticle(id: string): boolean {
@@ -51,7 +58,7 @@ export class ArticleCache {
   getArticlesByFeed(feedName: string, limit: number): CachedArticle[] {
     const rows = this.db
       .query(
-        `SELECT id, feed_name, title, link, pub_date, summary, status, error_message
+        `SELECT id, feed_name, title, link, pub_date, summary, image_url, status, error_message
          FROM articles
          WHERE feed_name = ? AND status IN ('done', 'error')
          ORDER BY pub_date DESC
@@ -64,6 +71,7 @@ export class ArticleCache {
       link: string;
       pub_date: string;
       summary: string | null;
+      image_url: string | null;
       status: "done" | "error";
       error_message: string | null;
     }>;
@@ -75,6 +83,7 @@ export class ArticleCache {
       link: r.link,
       pubDate: r.pub_date,
       summary: r.summary,
+      imageUrl: r.image_url,
       status: r.status,
       errorMessage: r.error_message,
     }));
@@ -83,10 +92,11 @@ export class ArticleCache {
   upsertArticle(article: CachedArticle): void {
     this.db
       .query(
-        `INSERT INTO articles (id, feed_name, title, link, pub_date, summary, status, error_message, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+        `INSERT INTO articles (id, feed_name, title, link, pub_date, summary, image_url, status, error_message, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
          ON CONFLICT(id) DO UPDATE SET
            summary = excluded.summary,
+           image_url = excluded.image_url,
            status = excluded.status,
            error_message = excluded.error_message,
            updated_at = datetime('now')`
@@ -98,6 +108,7 @@ export class ArticleCache {
         article.link,
         article.pubDate,
         article.summary,
+        article.imageUrl,
         article.status,
         article.errorMessage
       );
@@ -121,7 +132,7 @@ export class ArticleCache {
   getAllArticles(limit: number): CachedArticle[] {
     const rows = this.db
       .query(
-        `SELECT id, feed_name, title, link, pub_date, summary, status, error_message
+        `SELECT id, feed_name, title, link, pub_date, summary, image_url, status, error_message
          FROM articles
          WHERE status IN ('done', 'error')
          ORDER BY pub_date DESC
@@ -134,6 +145,7 @@ export class ArticleCache {
       link: string;
       pub_date: string;
       summary: string | null;
+      image_url: string | null;
       status: "done" | "error";
       error_message: string | null;
     }>;
@@ -145,6 +157,7 @@ export class ArticleCache {
       link: r.link,
       pubDate: r.pub_date,
       summary: r.summary,
+      imageUrl: r.image_url,
       status: r.status,
       errorMessage: r.error_message,
     }));

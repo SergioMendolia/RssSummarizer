@@ -8,6 +8,7 @@ export interface ExtractedArticle {
   title: string;
   textContent: string;
   excerpt: string;
+  imageUrl: string | null;
 }
 
 export async function extractArticle(url: string): Promise<ExtractedArticle | null> {
@@ -35,6 +36,13 @@ export async function extractArticle(url: string): Promise<ExtractedArticle | nu
     const html = await response.text();
     const { document } = parseHTML(html);
 
+    // Extract image from meta tags before Readability mutates the DOM
+    const imageUrl =
+      document.querySelector('meta[property="og:image"]')?.getAttribute("content") ||
+      document.querySelector('meta[name="twitter:image"]')?.getAttribute("content") ||
+      document.querySelector('meta[property="og:image:url"]')?.getAttribute("content") ||
+      null;
+
     const reader = new Readability(document);
     const article = reader.parse();
 
@@ -49,6 +57,7 @@ export async function extractArticle(url: string): Promise<ExtractedArticle | nu
       title: article.title || "Untitled",
       textContent,
       excerpt: article.excerpt || "",
+      imageUrl,
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

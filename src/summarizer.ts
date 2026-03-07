@@ -1,7 +1,7 @@
 import { Ollama } from "ollama";
 import type { LlmConfig } from "./config.ts";
 
-const SYSTEM_PROMPT = `You are a concise news summarizer. Given an article's title and content, write a clear 2-4 sentence summary capturing the key points. Be factual and neutral. Do not include any preamble like "This article discusses..." — just state the key information directly.`;
+const SYSTEM_PROMPT = `You are a concise news summarizer. Given an article's title and content, write a clear 2-4 sentence summary capturing the key points. Be factual and neutral. Do not include any preamble like "This article discusses..." — just state the key information directly. Always write the summary in the same language as the article.`;
 
 export class Summarizer {
   private client: Ollama;

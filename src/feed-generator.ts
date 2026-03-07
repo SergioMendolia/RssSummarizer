@@ -23,13 +23,17 @@ export function generateFeed(
   });
 
   for (const article of articles) {
+    const imageHtml = article.imageUrl
+      ? `<p><img src="${escapeHtml(article.imageUrl)}" alt="${escapeHtml(article.title)}" /></p>\n`
+      : "";
+
     let content: string;
     if (article.status === "error") {
-      content = `<p><em>Summary unavailable.</em></p>\n<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
+      content = `${imageHtml}<p><em>Summary unavailable.</em></p>\n<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
     } else if (article.summary) {
-      content = `<p>${escapeHtml(article.summary)}</p>\n<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
+      content = `${imageHtml}<p>${escapeHtml(article.summary)}</p>\n<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
     } else {
-      content = `<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
+      content = `${imageHtml}<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
     }
 
     feed.addItem({
@@ -39,6 +43,7 @@ export function generateFeed(
       description: article.status === "error" ? "Summary unavailable." : (article.summary || ""),
       content,
       date: new Date(article.pubDate),
+      ...(article.imageUrl ? { image: article.imageUrl } : {}),
     });
   }
 
@@ -61,13 +66,17 @@ export function generateAggregatedFeed(
   });
 
   for (const article of articles) {
+    const imageHtml = article.imageUrl
+      ? `<p><img src="${escapeHtml(article.imageUrl)}" alt="${escapeHtml(article.title)}" /></p>\n`
+      : "";
+
     let content: string;
     if (article.status === "error") {
-      content = `<p><em>Summary unavailable.</em></p>\n<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
+      content = `${imageHtml}<p><em>Summary unavailable.</em></p>\n<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
     } else if (article.summary) {
-      content = `<p>${escapeHtml(article.summary)}</p>\n<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
+      content = `${imageHtml}<p>${escapeHtml(article.summary)}</p>\n<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
     } else {
-      content = `<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
+      content = `${imageHtml}<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
     }
 
     feed.addItem({
@@ -77,6 +86,7 @@ export function generateAggregatedFeed(
       description: article.status === "error" ? "Summary unavailable." : (article.summary || ""),
       content,
       date: new Date(article.pubDate),
+      ...(article.imageUrl ? { image: article.imageUrl } : {}),
     });
   }
 

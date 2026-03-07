@@ -49,6 +49,7 @@ export class FeedProcessor {
         link: item.link,
         pubDate: item.pubDate,
         summary: null,
+        imageUrl: item.imageUrl,
         status: "pending",
         errorMessage: null,
       });
@@ -61,6 +62,9 @@ export class FeedProcessor {
         await sleep(DELAY_BETWEEN_ARTICLES_MS);
         continue;
       }
+
+      // Use feed image if available, otherwise use page OG image
+      const imageUrl = item.imageUrl || extracted.imageUrl;
 
       // Summarize
       const summary = await this.summarizer.summarize(extracted.title || item.title, extracted.textContent);
@@ -79,6 +83,7 @@ export class FeedProcessor {
         link: item.link,
         pubDate: item.pubDate,
         summary,
+        imageUrl,
         status: "done",
         errorMessage: null,
       });

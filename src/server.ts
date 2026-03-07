@@ -62,6 +62,7 @@ export function createServer(cache: ArticleCache, config: AppConfig): Hono {
           .map(
             (a) => `
         <article>
+          ${a.imageUrl ? `<img src="${esc(a.imageUrl)}" alt="" class="article-img">` : ""}
           <h3><a href="${esc(a.link)}">${esc(a.title)}</a></h3>
           <time datetime="${esc(a.pubDate)}">${new Date(a.pubDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</time>
           ${a.status === "error" ? "<p><em>Summary unavailable.</em></p>" : a.summary ? `<p>${esc(a.summary)}</p>` : ""}
@@ -89,6 +90,7 @@ export function createServer(cache: ArticleCache, config: AppConfig): Hono {
     article h3 a:hover { text-decoration: underline; }
     time { font-size: 0.85rem; color: #888; }
     article p { margin: 0.5rem 0 0; }
+    .article-img { max-width: 100%; max-height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 0.5rem; }
     footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #ddd; font-size: 0.85rem; color: #888; }
   </style>
 </head>
