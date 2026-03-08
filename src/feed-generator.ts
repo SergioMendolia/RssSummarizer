@@ -39,7 +39,7 @@ export function generateFeed(
 
     feed.addItem({
       title: article.title,
-      id: article.id,
+      id: `summarized:${feedConfig.name}:${article.id}`,
       link: article.link,
       description: article.status === "error" ? "Summary unavailable." : (article.summary || ""),
       content,
@@ -83,7 +83,7 @@ export function generateAggregatedFeed(
 
     feed.addItem({
       title: article.title,
-      id: article.id,
+      id: `summarized:all:${article.id}`,
       link: article.link,
       description: article.status === "error" ? "Summary unavailable." : (article.summary || ""),
       content,
