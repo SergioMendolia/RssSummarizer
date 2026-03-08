@@ -63,8 +63,8 @@ export class FeedProcessor {
         continue;
       }
 
-      // Use feed image if available, otherwise use page OG image
-      const imageUrl = item.imageUrl || extracted.imageUrl;
+      // Only use image if the feed provides one
+      const imageUrl = item.imageUrl;
 
       // Summarize
       const summary = await this.summarizer.summarize(extracted.title || item.title, extracted.textContent);

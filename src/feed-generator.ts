@@ -18,6 +18,7 @@ export function generateFeed(
     description: `AI-summarized version of ${feedConfig.name}`,
     id: feedUrl,
     link: feedUrl,
+    updated: new Date(),
     feedLinks: { rss: feedUrl },
     copyright: "",
   });
@@ -61,6 +62,7 @@ export function generateAggregatedFeed(
     description: "AI-summarized aggregation of all feeds",
     id: feedUrl,
     link: feedUrl,
+    updated: new Date(),
     feedLinks: { rss: feedUrl },
     copyright: "",
   });
