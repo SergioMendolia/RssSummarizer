@@ -44,7 +44,7 @@ export function generateFeed(
       description: article.status === "error" ? "Summary unavailable." : (article.summary || ""),
       content,
       date: new Date(article.pubDate),
-      ...(article.imageUrl ? { image: article.imageUrl } : {}),
+      ...(article.imageUrl && isAbsoluteUrl(article.imageUrl) ? { image: article.imageUrl } : {}),
     });
   }
 
@@ -88,11 +88,15 @@ export function generateAggregatedFeed(
       description: article.status === "error" ? "Summary unavailable." : (article.summary || ""),
       content,
       date: new Date(article.pubDate),
-      ...(article.imageUrl ? { image: article.imageUrl } : {}),
+      ...(article.imageUrl && isAbsoluteUrl(article.imageUrl) ? { image: article.imageUrl } : {}),
     });
   }
 
   return feed.rss2();
+}
+
+function isAbsoluteUrl(url: string): boolean {
+  return url.startsWith("http://") || url.startsWith("https://");
 }
 
 function escapeHtml(text: string): string {
