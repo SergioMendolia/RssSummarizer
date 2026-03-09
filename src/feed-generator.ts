@@ -21,7 +21,9 @@ function getImageEnclosure(url: string): { url: string; type: string; length: nu
     const ext = pathname.split(".").pop()?.toLowerCase();
     const mime = ext ? VALID_IMAGE_EXTENSIONS[ext] : undefined;
     if (!mime) return null;
-    return { url, type: mime, length: 0 };
+    // xml-js doesn't escape & in attribute values, so we must do it ourselves
+    const safeUrl = url.replace(/&/g, "&amp;");
+    return { url: safeUrl, type: mime, length: 0 };
   } catch {
     return null;
   }
