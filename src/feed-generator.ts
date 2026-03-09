@@ -2,6 +2,31 @@ import { Feed } from "feed";
 import type { FeedConfig } from "./config.ts";
 import type { CachedArticle } from "./cache.ts";
 
+const VALID_IMAGE_EXTENSIONS: Record<string, string> = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  gif: "image/gif",
+  webp: "image/webp",
+  svg: "image/svg+xml",
+  ico: "image/x-icon",
+  bmp: "image/bmp",
+  avif: "image/avif",
+};
+
+function getImageEnclosure(url: string): { url: string; type: string; length: number } | null {
+  if (!isAbsoluteUrl(url)) return null;
+  try {
+    const pathname = new URL(url).pathname;
+    const ext = pathname.split(".").pop()?.toLowerCase();
+    const mime = ext ? VALID_IMAGE_EXTENSIONS[ext] : undefined;
+    if (!mime) return null;
+    return { url, type: mime, length: 0 };
+  } catch {
+    return null;
+  }
+}
+
 export function generateFeed(
   feedConfig: FeedConfig,
   articles: CachedArticle[],
@@ -37,14 +62,16 @@ export function generateFeed(
       content = `${imageHtml}<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
     }
 
+    const enclosure = article.imageUrl ? getImageEnclosure(article.imageUrl) : null;
+
     feed.addItem({
       title: article.title,
       id: `summarized:${feedConfig.name}:${article.id}`,
       link: article.link,
-      description: article.status === "error" ? "Summary unavailable." : (article.summary || ""),
+      description: escapeXml(article.status === "error" ? "Summary unavailable." : (article.summary || "")),
       content,
       date: new Date(article.pubDate),
-      ...(article.imageUrl && isAbsoluteUrl(article.imageUrl) ? { image: article.imageUrl } : {}),
+      ...(enclosure ? { enclosure } : {}),
     });
   }
 
@@ -81,14 +108,16 @@ export function generateAggregatedFeed(
       content = `${imageHtml}<p><a href="${escapeHtml(article.link)}">Read the full article</a></p>`;
     }
 
+    const enclosure = article.imageUrl ? getImageEnclosure(article.imageUrl) : null;
+
     feed.addItem({
       title: article.title,
       id: `summarized:all:${article.id}`,
       link: article.link,
-      description: article.status === "error" ? "Summary unavailable." : (article.summary || ""),
+      description: escapeXml(article.status === "error" ? "Summary unavailable." : (article.summary || "")),
       content,
       date: new Date(article.pubDate),
-      ...(article.imageUrl && isAbsoluteUrl(article.imageUrl) ? { image: article.imageUrl } : {}),
+      ...(enclosure ? { enclosure } : {}),
     });
   }
 
@@ -105,4 +134,11 @@ function escapeHtml(text: string): string {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function escapeXml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }

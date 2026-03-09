@@ -22,6 +22,7 @@ export interface CacheConfig {
 export interface ServerConfig {
   port: number;
   host: string;
+  baseUrl?: string;
 }
 
 export interface AppConfig {
@@ -86,6 +87,7 @@ export function loadConfig(path = "config.yaml"): AppConfig {
     server: {
       port: Number(serverRaw.port) || 3000,
       host: String(serverRaw.host || "0.0.0.0"),
+      baseUrl: serverRaw.baseUrl ? String(serverRaw.baseUrl).replace(/\/+$/, "") : undefined,
     },
     llm: {
       host: String(llmRaw.host),

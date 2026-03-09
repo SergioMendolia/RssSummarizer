@@ -1,6 +1,7 @@
 server:
   port: 3000
   host: "0.0.0.0"
+  # baseUrl: "https://rss.example.com"  # Public URL for feed self-references (optional, defaults to http://host:port)
 
 llm:
   host: "http://localhost:11434"  # Ollama server URL

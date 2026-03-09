@@ -9,7 +9,7 @@ function esc(text: string): string {
 
 export function createServer(cache: ArticleCache, config: AppConfig): Hono {
   const app = new Hono();
-  const baseUrl = `http://${config.server.host === "0.0.0.0" ? "localhost" : config.server.host}:${config.server.port}`;
+  const baseUrl = config.server.baseUrl || `http://${config.server.host === "0.0.0.0" ? "localhost" : config.server.host}:${config.server.port}`;
 
   app.get("/feed/all", (c) => {
     const maxItems = Math.max(...config.feeds.map((f) => f.maxItems));
