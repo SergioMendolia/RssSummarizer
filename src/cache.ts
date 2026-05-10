@@ -163,6 +163,39 @@ export class ArticleCache {
     }));
   }
 
+  getErrorArticles(): CachedArticle[] {
+    const rows = this.db
+      .query(
+        `SELECT id, feed_name, title, link, pub_date, summary, image_url, status, error_message
+         FROM articles
+         WHERE status = 'error'
+         ORDER BY pub_date DESC`
+      )
+      .all() as Array<{
+      id: string;
+      feed_name: string;
+      title: string;
+      link: string;
+      pub_date: string;
+      summary: string | null;
+      image_url: string | null;
+      status: "error";
+      error_message: string | null;
+    }>;
+
+    return rows.map((r) => ({
+      id: r.id,
+      feedName: r.feed_name,
+      title: r.title,
+      link: r.link,
+      pubDate: r.pub_date,
+      summary: r.summary,
+      imageUrl: r.image_url,
+      status: r.status,
+      errorMessage: r.error_message,
+    }));
+  }
+
   getFeedStats(): Array<{ feedName: string; total: number; done: number; errors: number }> {
     const rows = this.db
       .query(

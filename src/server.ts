@@ -42,7 +42,7 @@ export function createServer(cache: ArticleCache, config: AppConfig): Hono {
     });
   });
 
-  app.get("/display", (c) => {
+  app.get("/", (c) => {
     const maxItems = Math.max(...config.feeds.map((f) => f.maxItems));
     const articles = cache.getAllArticles(maxItems);
 

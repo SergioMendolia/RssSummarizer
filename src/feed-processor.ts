@@ -1,5 +1,5 @@
 import type { AppConfig, FeedConfig } from "./config.ts";
-import { ArticleCache } from "./cache.ts";
+import { ArticleCache, type CachedArticle } from "./cache.ts";
 import { Summarizer } from "./summarizer.ts";
 import { parseFeed } from "./feed-parser.ts";
 import { extractArticle } from "./article-extractor.ts";
@@ -95,6 +95,49 @@ export class FeedProcessor {
     console.log(
       `[processor] Feed ${feedConfig.name}: ${newCount} new, ${cachedCount} cached, ${errorCount} errors`
     );
+  }
+
+  async resummarizeErrors(): Promise<void> {
+    const articles = this.cache.getErrorArticles();
+    if (articles.length === 0) {
+      console.log("[resummarize] No articles with errors found");
+      return;
+    }
+
+    console.log(`[resummarize] Retrying ${articles.length} articles`);
+    let recovered = 0;
+    let stillFailing = 0;
+
+    for (const article of articles) {
+      const extracted = await extractArticle(article.link);
+      if (!extracted) {
+        this.cache.markError(article.id, "Content extraction failed");
+        stillFailing++;
+        await sleep(DELAY_BETWEEN_ARTICLES_MS);
+        continue;
+      }
+
+      const summary = await this.summarizer.summarize(extracted.title || article.title, extracted.textContent);
+      if (!summary) {
+        this.cache.markError(article.id, "LLM summarization failed");
+        stillFailing++;
+        await sleep(DELAY_BETWEEN_ARTICLES_MS);
+        continue;
+      }
+
+      this.cache.upsertArticle({
+        ...article,
+        summary,
+        status: "done",
+        errorMessage: null,
+      } satisfies CachedArticle);
+
+      recovered++;
+      console.log(`[resummarize] ✓ ${article.feedName}: ${article.title}`);
+      await sleep(DELAY_BETWEEN_ARTICLES_MS);
+    }
+
+    console.log(`[resummarize] Done: ${recovered} recovered, ${stillFailing} still failing`);
   }
 
   async processAllFeeds(): Promise<void> {

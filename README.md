@@ -145,8 +145,20 @@ If you already have Ollama running outside Docker, `localhost` inside the contai
 
 ## Endpoints
 
+- `/` — HTML view of all summarized articles, grouped by feed
 - `/feed/:name` — the summarized RSS feed
+- `/feed/all` — aggregated RSS feed across all configured feeds
 - `/health` — status check with per-feed article counts
+
+## Retrying failed summaries
+
+Articles whose extraction or summarization failed are kept in the cache with an error status. To retry them all:
+
+```bash
+bun run resummarize
+```
+
+This walks every error article, re-extracts the content, and re-runs the LLM. Successful retries flip to `done`; the rest stay marked as errors.
 
 ## Stack
 

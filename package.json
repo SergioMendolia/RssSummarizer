@@ -6,7 +6,8 @@
   "private": true,
   "scripts": {
     "start": "bun run src/index.ts",
-    "dev": "bun --watch run src/index.ts"
+    "dev": "bun --watch run src/index.ts",
+    "resummarize": "bun run src/resummarize.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
